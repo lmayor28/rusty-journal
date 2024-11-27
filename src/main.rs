@@ -32,8 +32,9 @@ fn main() -> anyhow::Result<()> {
 
     // Perform the action.
     match action {
-        Add { task } => task::add_task(journal_file, Task::new(task)),
+        Add { task, priority } => task::add_task(journal_file, Task::new(task, priority)),
         List => task::list_tasks(journal_file),
+        Clear => task::clear_tasks(journal_file),
         Done { position} => task::complete_task(journal_file, position),
     }?;
 

@@ -8,6 +8,10 @@ pub enum Action {
         /// The task description text.
         #[structopt()]
         task: String,
+
+        /// The priority of the task
+        #[structopt(default_value = "0")]
+        priority: u32,
     },
     /// Remove an entry from the journal file by position.
     Done {
@@ -16,6 +20,9 @@ pub enum Action {
     },
     /// List all tasks in the journal file.
     List,
+
+    /// Empty the journal file.
+    Clear,
 }
 
 #[derive(Debug, StructOpt)]
@@ -30,4 +37,6 @@ pub struct CommandLineArgs {
     /// Use a different journal file.
     #[structopt(parse(from_os_str), short, long)]
     pub journal_file: Option<PathBuf>,
+
+    
 }

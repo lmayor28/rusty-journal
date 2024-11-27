@@ -259,8 +259,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "rusty-journal"
-version = "0.1.0"
+name = "rujo"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "chrono",

@@ -10,6 +10,8 @@ pub struct Task {
 
     #[serde(with = "ts_seconds")]
     pub created_at: DateTime<Utc>,
+
+    pub priority: u32,
 }
 
 impl fmt::Display for Task {
@@ -20,13 +22,14 @@ impl fmt::Display for Task {
 }
 
 impl Task {
-    pub fn new(text: String) -> Task {
+    pub fn new(text: String, priority: u32) -> Task {
         let created_at: DateTime<Utc> = Utc::now();
-        Task { text, created_at }
+        Task { text, created_at, priority }
     }
 }
 
 use std::fs::{File, OpenOptions};
+use std::io;
 use std::io::{Result, Seek, SeekFrom, Error, ErrorKind};
 use std::path::PathBuf;
 
@@ -43,8 +46,15 @@ pub fn add_task( journal_path: PathBuf, task: Task) -> Result<()> {
 
     file.seek(SeekFrom::Start(0))?;
 
+
+
+    
+    println!("Se ha agregado a la lista:\nTAREA: {}", task);
     tasks.push(task);
+
     serde_json::to_writer(file, &tasks)?;
+    
+    
 
     Ok(())
 
@@ -64,13 +74,14 @@ pub fn complete_task( journal_path: PathBuf, task_position: usize) -> Result<()>
         return Err(Error::new(ErrorKind::InvalidInput, "Invalid Task ID"));
     }
 
-    tasks.remove(task_position - 1 );
+    let task = tasks.remove(task_position - 1 );
 
     // Rewind and truncate the file
     file.seek(SeekFrom::Start(0))?;
     file.set_len(0)?;
 
     serde_json::to_writer(file, &tasks)?;
+    println!("Se ha completado: {}.", task);
     Ok(())
 }
 
@@ -100,16 +111,36 @@ pub fn list_tasks( journal_path: PathBuf) -> Result<()> {
     } else {
         let mut order: u32 = 1;
         for task in tasks {
-            println!("{}: {}", order, task);
+            
+            println!("{}: {}, priority: {}", order, task,  task.priority);
             order += 1;
         }
-
     }
-
-
-
     Ok(())
-
-
 }
 
+pub fn clear_tasks(journal_path: PathBuf) -> Result<()>{
+    println!("¿Estás seguro de que quieres borrar todas las tareas? (y/n):");
+    let mut input = String::new();
+    io::stdin().read_line(&mut input)?;
+    let input = input.trim().to_lowercase();
+
+    println!("Entrada recibida: '{}'", input);
+
+    if input == "y" || input == "yes"{
+        println!("Confirmación recibida. Procediendo a borrar las tareas...");
+        let file = OpenOptions::new() 
+            .write(true)
+            .truncate(true)
+            .open(journal_path)?;
+        file.set_len(0)?;
+
+        println!("La lista de tareas ha sido borrada.");
+    } else {
+        println!("Operación cancelada.");
+    }
+    
+    
+    Ok(())
+
+}
