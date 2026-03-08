@@ -13,7 +13,7 @@ Para instalar Rusty Journal, sigue estos pasos:
 1. Clona el repositorio:
 
     ```sh
-    git clone https://github.com/tuusuario/rusty-journal.git
+    git clone https://github.com/lmayor28/rusty-journal.git
     cd rusty-journal
     ```
 
